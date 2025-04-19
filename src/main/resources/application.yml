@@ -1,0 +1,15 @@
+spring:
+  # 默认 dev 环境
+  profiles:
+    active: dev
+  application.name: thumb-backend
+  mvc:
+    servlet:
+      path: /api
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
