@@ -49,11 +49,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
         // 查询用户是否点赞
         Long userId = loginUser.getId();
-        Long count = thumbService.lambdaQuery()
-                .eq(Thumb::getUserId, userId)
-                .eq(Thumb::getBlogId, blogId)
-                .count();
-        blogVO.setHasThumb(count > 0);
+        blogVO.setHasThumb(thumbService.hasThumb(blogId, userId));
 
         return blogVO;
     }
@@ -74,11 +70,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
             // 查询用户是否点赞
             Long userId = loginUser.getId();
-            Long count = thumbService.lambdaQuery()
-                    .eq(Thumb::getUserId, userId)
-                    .eq(Thumb::getBlogId, blog.getId())
-                    .count();
-            blogVO.setHasThumb(count > 0);
+            blogVO.setHasThumb(thumbService.hasThumb(blog.getId(), userId));
 
             return blogVO;
         }).toList();

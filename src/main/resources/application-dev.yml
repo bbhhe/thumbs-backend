@@ -5,3 +5,11 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/thumbsdb
     username: root
     password: 123456
+  data:
+    # Redis 配置
+    redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      timeout: 5000
+      password: bbhhe1
