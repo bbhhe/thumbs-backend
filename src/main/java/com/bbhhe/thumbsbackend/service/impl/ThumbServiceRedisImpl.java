@@ -10,14 +10,14 @@ import com.bbhhe.thumbsbackend.exception.ThrowUtils;
 import com.bbhhe.thumbsbackend.mapper.ThumbMapper;
 import com.bbhhe.thumbsbackend.model.entity.Thumb;
 import com.bbhhe.thumbsbackend.service.ThumbService;
+import com.bbhhe.thumbsbackend.utils.RedisKeyUtil;
 import jakarta.annotation.Resource;
-
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 
-@Service
-public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {
+@Service("thumbServiceRedis")
+public class ThumbServiceRedisImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -25,8 +25,8 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
     @Override
     public boolean undoThumb(Long blogId, Long userId) {
         Long result = redisTemplate.execute(RedisScriptConstant.UNTHUMB_SCRIPT,
-                ListUtil.toList("thumb:temp:" + getTimeSlice(),
-                        "thumb:" + userId), userId, blogId);
+                ListUtil.toList(RedisKeyUtil.getTempThumbKey(getTimeSlice()),
+                        RedisKeyUtil.getUserThumbKey(userId)), userId, blogId);
 
         ThrowUtils.throwIf(-1==result, ErrorCode.PARAMS_ERROR,"用户未点赞");
 
@@ -37,8 +37,8 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
     public boolean doThumb(Long blogId, Long userId) {
 
         Long result = redisTemplate.execute(RedisScriptConstant.THUMB_SCRIPT,
-                ListUtil.toList("thumb:temp:" + getTimeSlice(),
-                        "thumb:" + userId), userId, blogId);
+                ListUtil.toList(RedisKeyUtil.getTempThumbKey(getTimeSlice()),
+                        RedisKeyUtil.getUserThumbKey(userId)), userId, blogId);
 
         ThrowUtils.throwIf(-1==result, ErrorCode.PARAMS_ERROR,"用户已经点赞");
 
@@ -54,8 +54,7 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
     @Override
     public Boolean hasThumb(Long blogId, Long userId) {
         // 直接检查Redis中的点赞记录
-        String userThumbKey = "thumb:" + userId;
-        return redisTemplate.opsForHash().hasKey(userThumbKey, blogId.toString());
+        return redisTemplate.opsForHash().hasKey(RedisKeyUtil.getUserThumbKey(userId), blogId.toString());
     }
 
 }
