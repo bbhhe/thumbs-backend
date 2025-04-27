@@ -39,7 +39,7 @@ public class SyncThumb2DBJob {
     @Resource
     private BlogMapper blogMapper;
 
-    @Scheduled(fixedRate = 10000) // 每10秒执行一次
+    //@Scheduled(fixedRate = 10000) // 每10秒执行一次
     @Transactional(rollbackFor = Exception.class)
     public void syncThumbData() {
         log.info("开始执行");

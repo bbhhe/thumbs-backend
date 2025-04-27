@@ -27,14 +27,14 @@ public class SyncThumb2DBCompensatoryJob {
     @Resource
     private SyncThumb2DBJob syncThumb2DBJob;
 
-    @PostConstruct
-    public void init() {
-        log.info("应用启动，执行一次补偿任务");
-        run(); // 调用 run 方法
-    }
+//    @PostConstruct
+//    public void init() {
+//        log.info("应用启动，执行一次补偿任务");
+//        run(); // 调用 run 方法
+//    }
 
 
-    @Scheduled(cron = "0 0 2 * * *")
+    //@Scheduled(cron = "0 0 2 * * *")
     public void run() {
         log.info("开始补偿数据");
         Set<String> thumbKeys = redisTemplate.keys(RedisKeyUtil.getTempThumbKey("")+"*");

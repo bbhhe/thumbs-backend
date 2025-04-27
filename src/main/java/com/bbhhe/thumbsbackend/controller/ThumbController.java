@@ -5,6 +5,7 @@ import com.bbhhe.thumbsbackend.common.ResultUtils;
 import com.bbhhe.thumbsbackend.model.dto.thumb.DoThumbRequest;
 import com.bbhhe.thumbsbackend.model.entity.User;
 import com.bbhhe.thumbsbackend.service.ThumbService;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @RestController
 @RequestMapping("/thumb")
 public class ThumbController {
-    @Autowired
-    @Qualifier("thumbServiceRedis")
+    @Resource
+    @Qualifier("thumbService")
     private ThumbService thumbService;
 
     @PostMapping("/do")
