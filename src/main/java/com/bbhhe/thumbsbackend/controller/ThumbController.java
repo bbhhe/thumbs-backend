@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @RestController
 @RequestMapping("/thumb")
 public class ThumbController {
-    @Resource
-    @Qualifier("thumbService")
+    @Autowired
+    @Qualifier("thumbServiceMq")
     private ThumbService thumbService;
 
     @PostMapping("/do")

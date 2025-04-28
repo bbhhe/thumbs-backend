@@ -23,7 +23,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-@Service("thumbService")
+@Service("thumbServicelocal")
 public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {
 
     @Resource
