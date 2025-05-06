@@ -3,6 +3,7 @@ package com.bbhhe.thumbsbackend.service.impl;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.StopWatch;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bbhhe.thumbsbackend.constant.RedisScriptConstant;
 import com.bbhhe.thumbsbackend.exception.ErrorCode;
@@ -35,12 +36,15 @@ public class ThumbServiceMQImpl extends ServiceImpl<ThumbMapper, Thumb> implemen
     @Override
     public boolean undoThumb(Long blogId, Long userId) {
         String userThumbKey = RedisKeyUtil.getUserThumbKey(userId);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("Redis 操作");
         //执行lua脚本
         Long result = redisTemplate.execute(RedisScriptConstant.UNTHUMB_SCRIPT_MQ,
                 ListUtil.toList(RedisKeyUtil.getUserThumbKey(userId)), blogId);
-
         ThrowUtils.throwIf(-1==result, ErrorCode.PARAMS_ERROR,"用户未点赞");
+        stopWatch.stop();
 
+        stopWatch.start("消息队列操作");
         ThumbEvent thumbEvent = ThumbEvent.builder().userId(userId).blogId(blogId)
                 .eventTime(LocalDateTime.now()).type(ThumbEvent.EventType.DECR).build();
 
@@ -49,19 +53,23 @@ public class ThumbServiceMQImpl extends ServiceImpl<ThumbMapper, Thumb> implemen
             log.error("点赞事件发送失败: userId={}, blogId={}", userId, blogId, ex);
             return null;
         });
-
+        stopWatch.stop();
         return 1 == result;
     }
 
     @Override
     public boolean doThumb(Long blogId, Long userId) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("Redis 操作");
         //执行lua脚本
         String userThumbKey = RedisKeyUtil.getUserThumbKey(userId);
         Long result = redisTemplate.execute(RedisScriptConstant.THUMB_SCRIPT_MQ,
                 ListUtil.toList(userThumbKey), blogId);
 
         ThrowUtils.throwIf(-1==result, ErrorCode.PARAMS_ERROR,"用户已经点赞");
+        stopWatch.stop();
 
+        stopWatch.start("消息队列操作");
         ThumbEvent thumbEvent = ThumbEvent.builder().userId(userId).blogId(blogId)
                 .eventTime(LocalDateTime.now()).type(ThumbEvent.EventType.INCR).build();
 
@@ -70,6 +78,8 @@ public class ThumbServiceMQImpl extends ServiceImpl<ThumbMapper, Thumb> implemen
             log.error("点赞事件发送失败: userId={}, blogId={}", userId, blogId, ex);
             return null;
         });
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
         return true;
     }
 

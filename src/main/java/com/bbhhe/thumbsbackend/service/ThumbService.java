@@ -10,14 +10,14 @@ public interface ThumbService extends IService<Thumb> {
      * @param userId 用户id
      * @return 是否成功
      */
-    boolean undoThumb(Long blogId, Long userId);
+    boolean undoThumb(Long blogId, Long userId) throws InterruptedException;
     /**
      * 执行点赞操作
      * @param blogId 博客ID
      * @param userId 用户ID
      * @return 是否点赞成功
      */
-    boolean doThumb(Long blogId, Long userId);
+    boolean doThumb(Long blogId, Long userId) throws InterruptedException;
 
     /**
      * 是否点赞
